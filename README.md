@@ -8,7 +8,7 @@ Often we have multiple tab-delimited files that contain key-value pairs, and we 
 
 For instance, suppose we have following three files
 
-1. File 1
+__File 1__
 
 |Key | Value1|
 |----|------|
@@ -16,7 +16,7 @@ For instance, suppose we have following three files
 |B   |  2  |
 |C   |  3  |
 
-2. File 2
+__File 2__
 
 |Key | Value2|
 |----|-------|
@@ -24,7 +24,7 @@ For instance, suppose we have following three files
 | C  |   3   |
 | D  |   4   |
 
-3. File 3
+__File 3__
 
 | Key | Value3 |
 |-----|--------|
@@ -32,7 +32,7 @@ For instance, suppose we have following three files
 |  B  |  3     |
 
 
-Note that keys in different files may be different. 
+Note that keys in different files may be different and may be not sorted. 
 
 Now we want to merge them into one matrix:
 
