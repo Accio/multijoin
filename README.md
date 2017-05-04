@@ -42,7 +42,6 @@ Now we want to merge them into one matrix:
 | B   |  2     |   NA   |  3     |
 | C   |  3     |   3    |  NA    |
 | D   |  NA    |   NA   |  NA    |
-|-----|--------|--------|--------|
 
 The multijoin tool efficiently performs this operation. 
 
