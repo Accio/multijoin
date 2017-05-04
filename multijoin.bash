@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # A POSIX variable
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
@@ -47,14 +47,12 @@ fi
 
 ## file list in $@
 function sortWithHeader() {
-  res=/tmp/mj-`basename $1`
-  awk 'NR==1; NR>1{print $0|"sort -n"}' $1 > ${res}
+  local res="<(awk 'NR==1; NR>1{print \$0|\"sort -n\"}' $1)"
   echo "$res"
 }
 
 function sortWoHeader() {
-  res=/tmp/mj-`basename $1`
-  sort -k 1b,1 $1 > ${res}
+  local res="<(sort -k 1b,1 $1)"
   echo "$res"
 }
 
@@ -74,10 +72,6 @@ else
   f2=$(sortWoHeader $2)
 fi
 
-TMPS=()
-TMPS+=($f1)
-TMPS+=($f2)
-
 joinOpts="${header} -a 1 -a 2 -j ${key_field} -o auto -e NA"
 comm="join ${joinOpts} ${f1} ${f2}"
 shift; shift;
@@ -88,7 +82,6 @@ for afile in "$@"; do
   else
     tmpfile=$(sortWoHeader $afile)
   fi
-  TMPS+=($tmpfile)
   comm="${comm} | join ${joinOpts} - ${tmpfile}"
 done
 
@@ -101,11 +94,6 @@ if [ "$hasHeader" != true ]; then
   echo "key" $infiles
 fi
 eval $comm
-
-## remove tmp files
-for tmp in "${TMPS[@]}"; do
-  rm -f ${tmp}
-done
 
 exit 0
 
