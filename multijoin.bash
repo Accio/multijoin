@@ -7,14 +7,19 @@ OPTIND=1         # Reset in case getopts has been used previously in the shell.
 key_field=1
 value_field=2
 hasHeader=false;
+sep="$'\t'";
 unset debug
 
 show_help()
 {
-  echo "Usage: -k KEY_FIELD -v VALUE_FIELD -H"
+  echo "Usage: multijoin.bash -k KEY_FIELD -v VALUE_FIELD -s SEP -H"
+  echo "  -k: the field (starting from 1) that is used as the key to join. Default: 1"
+  echo "  -v: the field that contains the values. Default: 2"
+  echo "  -s: separator. Default: tab"
+  echo "  -H: input files contains one header line"
 }
 
-while getopts "dh?k:v:H" opt; do
+while getopts "dh?s:k:v:H" opt; do
   case "$opt" in
     d)
 	echo "Debugging mode"
@@ -23,6 +28,9 @@ while getopts "dh?k:v:H" opt; do
     h|\?)
 	show_help
 	exit 0
+	;;
+    s)
+	sep="$OPTARG"
 	;;
     k)
 	key_field=$OPTARG
@@ -72,7 +80,7 @@ else
   f2=$(sortWoHeader $2)
 fi
 
-joinOpts="${header} -a 1 -a 2 -j ${key_field} -o auto -e NA"
+joinOpts="${header} -t ${sep} -a 1 -a 2 -j ${key_field} -o auto -e NA"
 comm="join ${joinOpts} ${f1} ${f2}"
 shift; shift;
 
@@ -91,7 +99,8 @@ fi
 
 ## in case no header exists, input file names are printed as the header
 if [ "$hasHeader" != true ]; then
-  echo "key" $infiles
+  printf "%s\t" "key"
+  echo ${infiles[*]} | tr " " "\t"
 fi
 eval $comm
 
