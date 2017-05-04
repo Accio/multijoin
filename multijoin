@@ -7,7 +7,7 @@ OPTIND=1         # Reset in case getopts has been used previously in the shell.
 key_field=1
 value_field=2
 hasHeader=false;
-sep="$'\t'";
+sep='\t';
 unset debug
 
 show_help()
@@ -15,7 +15,7 @@ show_help()
   echo "Usage: $0 -k KEY_FIELD -v VALUE_FIELD -s SEP -H file1 file2 ..."
   echo "  -k: the field (starting from 1) that is used as the key to join. Default: 1"
   echo "  -v: the field that contains the values. Default: 2"
-  echo "  -s: separator. Default: tab"
+  echo "  -s: separator in the input file. Default: tab"
   echo "  -H: input files contains one header line"
 }
 
@@ -55,12 +55,12 @@ fi
 
 ## file list in $@
 function sortWithHeader() {
-  local res="<(awk 'NR==1; NR>1{print \$0|\"sort -n\"}' $1)"
+  local res="<(awk -v FS=\"${sep}\" -v OFS='\t' 'NR==1{print \$${key_field},\$${value_field}}; NR>1{print \$${key_field},\$${value_field}|\"sort -k 1b,1\"}' $1)"
   echo "$res"
 }
 
 function sortWoHeader() {
-  local res="<(sort -k 1b,1 $1)"
+  local res="<(awk -v FS=\"${sep}\" -v OFS='\t' '{print \$${key_field},\$${value_field}|\"sort -k 1b,1\"}' $1)"
   echo "$res"
 }
 
@@ -86,7 +86,7 @@ else
   f2=$(sortWoHeader $2)
 fi
 
-joinOpts="${header} -t ${sep} -a 1 -a 2 -j ${key_field} -o auto -e NA"
+joinOpts="${header} -t $'\t' -a 1 -a 2 -j 1 -o auto -e NA"
 comm="join ${joinOpts} ${f1} ${f2}"
 shift; shift;
 
