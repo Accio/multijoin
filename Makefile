@@ -1,15 +1,22 @@
+TD=./testdata/
+
 test: testWithHeader testWoHeader
 
-testWithHeader:testWithHeader-output  testWithHeader-expectedOutput
-	diff testWithHeader-output testWithHeader-expectedOutput
+testWithHeader:${TD}/testWithHeader-output  ${TD}/testWithHeader-expectedOutput
+	diff ${TD}/testWithHeader-output ${TD}/testWithHeader-expectedOutput
 
-testWithHeader-output: file1 file2 file3
-	./multijoin -H file1 file2 file3 > testWithHeader-output
-	@cat testWithHeader-output
+${TD}/testWithHeader-output: ${TD}/file1 ${TD}/file2 ${TD}/file3
+	./multijoin -H ${TD}/file1 ${TD}/file2 ${TD}/file3 > ${TD}/testWithHeader-output
+	@cat ${TD}/testWithHeader-output
 
-testWoHeader: testWoHeade-output testWoHeader-expectedOutput
-	diff testWoHeader-output testWoHeader-expectedOutput
+testWoHeader: ${TD}/testWoHeade-output ${TD}/testWoHeader-expectedOutput
+	diff ${TD}/testWoHeader-output${TD}/ testWoHeader-expectedOutput
 
-testWoHeade-output:nh-file1 nh-file2 nh-file3
-	./multijoin nh-file1 nh-file2 nh-file3 > testWoHeader-output
-	@cat testWoHeader-output
+${TD}/testWoHeade-output:${TD}/nh-file1 ${TD}/nh-file2 ${TD}/nh-file3
+	./multijoin ${TD}/nh-file1 ${TD}/nh-file2 ${TD}/nh-file3 > ${TD}/testWoHeader-output
+	@cat ${TD}/testWoHeader-output
+
+clean:
+	@rm -f *~
+	@rm -f ${TD}/testWithHeader-output
+	@rm -f ${TD}/testWoHeade-output
