@@ -66,12 +66,17 @@ else
   f2=$2
 fi
 
+TMPS=()
+TMPS+=($f1)
+TMPS+=($f2)
+
 joinOpts="${header} -a 1 -a 2 -j ${key_field} -o auto -e NA"
 comm="join ${joinOpts} -e NA ${f1} ${f2}"
 shift; shift;
 
 for afile in "$@"; do
   tmpfile=$(sortWithHeader $afile)
+  TMPS+=($tmpfile)
   comm="${comm} | join ${joinOpts} - ${tmpfile}"
 done
 
@@ -80,4 +85,11 @@ if [ ! -z $debug ]; then
 fi
 
 eval $comm
+
+## remove tmp files
+for tmp in "${TMPS[@]}"; do
+  rm -f ${tmp}
+done
+
+exit 0
 
