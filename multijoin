@@ -12,7 +12,7 @@ unset debug
 
 show_help()
 {
-  echo "Usage: multijoin.bash -k KEY_FIELD -v VALUE_FIELD -s SEP -H"
+  echo "Usage: $0 -k KEY_FIELD -v VALUE_FIELD -s SEP -H file1 file2 ..."
   echo "  -k: the field (starting from 1) that is used as the key to join. Default: 1"
   echo "  -v: the field that contains the values. Default: 2"
   echo "  -s: separator. Default: tab"
@@ -66,6 +66,8 @@ function sortWoHeader() {
 
 ## check length
 if [ $# -lt 2 ]; then
+  show_help
+  echo
   echo At least two files are needed as input. Program exists
   exit 1
 fi
