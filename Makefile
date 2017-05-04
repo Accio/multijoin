@@ -19,4 +19,4 @@ ${TD}/testWoHeade-output:${TD}/nh-file1 ${TD}/nh-file2 ${TD}/nh-file3
 clean:
 	@rm -f *~
 	@rm -f ${TD}/testWithHeader-output
-	@rm -f ${TD}/testWoHeade-output
+	@rm -f ${TD}/testWoHeader-output
