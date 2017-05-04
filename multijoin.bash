@@ -6,7 +6,7 @@ OPTIND=1         # Reset in case getopts has been used previously in the shell.
 # Initialize our own variables:
 key_field=1
 value_field=2
-header=""
+hasHeader=false;
 unset debug
 
 show_help()
@@ -31,6 +31,7 @@ while getopts "dh?k:v:H" opt; do
 	value_field=$OPTARG
 	;;
     H)
+	hasHeader=true
 	header='--header'
 	;;
     esac
@@ -51,6 +52,11 @@ function sortWithHeader() {
   echo "$res"
 }
 
+function sortWoHeader() {
+  res=/tmp/mj-`basename $1`
+  sort -k 1b,1 $1 > ${res}
+  echo "$res"
+}
 
 ## check length
 if [ $# -lt 2 ]; then
@@ -58,12 +64,14 @@ if [ $# -lt 2 ]; then
   exit 1
 fi
 
-if [ ${header}=="header" ]; then
+infiles=$@
+
+if [ "$hasHeader" = true ]; then
   f1=$(sortWithHeader $1)
   f2=$(sortWithHeader $2)
 else
-  f1=$1
-  f2=$2
+  f1=$(sortWoHeader $1)
+  f2=$(sortWoHeader $2)
 fi
 
 TMPS=()
@@ -71,11 +79,15 @@ TMPS+=($f1)
 TMPS+=($f2)
 
 joinOpts="${header} -a 1 -a 2 -j ${key_field} -o auto -e NA"
-comm="join ${joinOpts} -e NA ${f1} ${f2}"
+comm="join ${joinOpts} ${f1} ${f2}"
 shift; shift;
 
 for afile in "$@"; do
-  tmpfile=$(sortWithHeader $afile)
+  if [ "$hasHeader" = true ]; then
+    tmpfile=$(sortWithHeader $afile)
+  else
+    tmpfile=$(sortWoHeader $afile)
+  fi
   TMPS+=($tmpfile)
   comm="${comm} | join ${joinOpts} - ${tmpfile}"
 done
@@ -84,6 +96,10 @@ if [ ! -z $debug ]; then
    echo COMM=$comm
 fi
 
+## in case no header exists, input file names are printed as the header
+if [ "$hasHeader" != true ]; then
+  echo "key" $infiles
+fi
 eval $comm
 
 ## remove tmp files
