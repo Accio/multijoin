@@ -70,7 +70,11 @@ if [ $# -lt 2 ]; then
   exit 1
 fi
 
-infiles=$@
+## infiles contain basenames of input files
+infiles=()
+for infile in "$@"; do
+  infiles+=($(basename ${infile}))
+done
 
 if [ "$hasHeader" = true ]; then
   f1=$(sortWithHeader $1)
