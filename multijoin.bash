@@ -7,14 +7,19 @@ OPTIND=1         # Reset in case getopts has been used previously in the shell.
 key_field=1
 value_field=2
 header=""
+unset debug
 
 show_help()
 {
   echo "Usage: -k KEY_FIELD -v VALUE_FIELD -H"
 }
 
-while getopts "h?k:v:H" opt; do
+while getopts "dh?k:v:H" opt; do
   case "$opt" in
+    d)
+	echo "Debugging mode"
+	debug="DEBUG"
+	;;
     h|\?)
 	show_help
 	exit 0
@@ -33,9 +38,11 @@ done
 
 shift $((OPTIND-1))
 
-echo KEY_FIELD = "${key_field}"
-echo VALUE_FIELD = "${value_field}"
-echo HEADER = "${header}"
+if [ ! -z $debug ]; then
+  echo KEY_FIELD = "${key_field}"
+  echo VALUE_FIELD = "${value_field}"
+  echo HEADER = "${header}"
+fi
 
 ## file list in $@
 function sortWithHeader() {
@@ -51,7 +58,7 @@ if [ $# -lt 2 ]; then
   exit 1
 fi
 
-if [ $header=="header" ]; then
+if [ ${header}=="header" ]; then
   f1=$(sortWithHeader $1)
   f2=$(sortWithHeader $2)
 else
@@ -59,15 +66,18 @@ else
   f2=$2
 fi
 
-joinOpts="${header} -a 2 -a 1 -j ${key_field} -o auto -e NA"
-firstComm="join ${joinOpts} -e NA ${f1} ${f2}"
-echo FIRSTCOMM=${firstComm}
+joinOpts="${header} -a 1 -a 2 -j ${key_field} -o auto -e NA"
+comm="join ${joinOpts} -e NA ${f1} ${f2}"
 shift; shift;
+
 for afile in "$@"; do
   tmpfile=$(sortWithHeader $afile)
-  firstComm="${firstComm} | join ${joinOpts} - ${tmpfile}"
+  comm="${comm} | join ${joinOpts} - ${tmpfile}"
 done
 
-echo $firstComm
-eval $firstComm
+if [ ! -z $debug ]; then
+   echo COMM=$comm
+fi
+
+eval $comm
 
